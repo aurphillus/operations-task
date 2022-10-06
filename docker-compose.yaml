@@ -1,0 +1,28 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres:13.5-alpine3.15
+    restart: always
+    volumes:
+      - ./db/rates.sql:/docker-entrypoint-initdb.d/rates.sql
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - db
+  rates:
+    image: rates
+    build: ./rates/
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - db
+    restart: on-failure
+
+networks:
+  db:
